@@ -1,0 +1,126 @@
+{
+  "name": "high_number_of_queued_threads_in_elasticsearch_thread_pool",
+  "description": "This incident type occurs when the number of queued threads in a thread pool in elasticsearch is higher than the acceptable limit. This may indicate that the thread pool is unable to handle the current workload, which can lead to performance issues and delays in processing requests. It is important to investigate and address this issue promptly to ensure optimal performance of the system.",
+  "params": [
+    {
+      "name": "ELASTICSEARCH_HOST",
+      "value": ""
+    },
+    {
+      "name": "ELASTICSEARCH_CONFIG_PATH",
+      "value": ""
+    },
+    {
+      "name": "DESIRED_THREAD_COUNT",
+      "value": ""
+    },
+    {
+      "name": "THREAD_POOL_NAME",
+      "value": ""
+    },
+    {
+      "name": "HOST_NAME",
+      "value": ""
+    },
+    {
+      "name": "K8S_CLUSTER_NAME",
+      "value": ""
+    },
+    {
+      "name": "NAMESPACE",
+      "value": ""
+    }
+  ],
+  "cells": [
+    {
+      "name": "cell_1",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## High Number of Queued Threads in Elasticsearch Thread Pool\nThis incident type occurs when the number of queued threads in a thread pool in elasticsearch is higher than the acceptable limit. This may indicate that the thread pool is unable to handle the current workload, which can lead to performance issues and delays in processing requests. It is important to investigate and address this issue promptly to ensure optimal performance of the system."
+    },
+    {
+      "name": "cell_2",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the number of queued threads in Elasticsearch"
+    },
+    {
+      "name": "cell_3",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `curl -s -XGET 'http://${ELASTICSEARCH_HOST}:9200/_cat/thread_pool?v' | grep -E '^search' | awk '{print $5}'`"
+    },
+    {
+      "name": "cell_4",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the number of available threads in Elasticsearch"
+    },
+    {
+      "name": "cell_5",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `curl -s -XGET 'http://${ELASTICSEARCH_HOST}:9200/_cat/thread_pool?v' | grep -E '^search' | awk '{print $4}'`"
+    },
+    {
+      "name": "cell_6",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the number of active threads in Elasticsearch"
+    },
+    {
+      "name": "cell_7",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `curl -s -XGET 'http://${ELASTICSEARCH_HOST}:9200/_cat/thread_pool?v' | grep -E '^search' | awk '{print $3}'`"
+    },
+    {
+      "name": "cell_8",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the number of rejected requests in Elasticsearch"
+    },
+    {
+      "name": "cell_9",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `curl -s -XGET 'http://${ELASTICSEARCH_HOST}:9200/_cat/thread_pool?v' | grep -E '^search' | awk '{print $6}'`"
+    },
+    {
+      "name": "cell_10",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the number of completed requests in Elasticsearch"
+    },
+    {
+      "name": "cell_11",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `curl -s -XGET 'http://${ELASTICSEARCH_HOST}:9200/_cat/thread_pool?v' | grep -E '^search' | awk '{print $7}'`"
+    },
+    {
+      "name": "cell_12",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the number of failed requests in Elasticsearch"
+    },
+    {
+      "name": "cell_13",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `curl -s -XGET 'http://${ELASTICSEARCH_HOST}:9200/_cat/thread_pool?v' | grep -E '^search' | awk '{print $8}'`"
+    },
+    {
+      "name": "cell_14",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Increase the number of threads available in the thread pool in elasticsearch to avoid excessive queuing."
+    },
+    {
+      "name": "cell_15",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "host | host_name=$HOST_NAME | invoke_elasticsearch_threadpool_increase($ELASTICSEARCH_CONFIG_PATH, $DESIRED_THREAD_COUNT, $THREAD_POOL_NAME)"
+    }
+  ]
+}
